@@ -1,28 +1,35 @@
 package com.tck.player
 
+
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.TextView
+import android.view.WindowManager
+import com.tck.player.R.layout.activity_main
+import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
+
+    private lateinit var myPlayer: MyPlayer
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        window.setFlags(
+            WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,
+            WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+        )
+        setContentView(activity_main)
 
-        // Example of a call to a native method
-        findViewById<TextView>(R.id.sample_text).text = stringFromJNI()
-    }
+        //3.2.2.1 23
+        myPlayer = MyPlayer()
+        myPlayer.setSurfaceView(surfaceView)
 
-    /**
-     * A native method that is implemented by the 'native-lib' native library,
-     * which is packaged with this application.
-     */
-    external fun stringFromJNI(): String
-
-    companion object {
-        // Used to load the 'native-lib' library on application startup.
-        init {
-            System.loadLibrary("native-lib")
+        btn_start_play.setOnClickListener {
+            open()
         }
     }
+
+    private fun open() {
+
+    }
+
+
 }
