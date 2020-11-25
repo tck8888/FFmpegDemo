@@ -1,6 +1,7 @@
 package com.tck.player
 
 
+import android.view.Surface
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 
@@ -28,7 +29,7 @@ class MyPlayer : SurfaceHolder.Callback {
         if (surfaceHolder != null) {
             surfaceHolder?.removeCallback(this)
         }
-        surfaceHolder=surfaceView.holder
+        surfaceHolder = surfaceView.holder
         surfaceHolder?.addCallback(this)
     }
 
@@ -37,11 +38,20 @@ class MyPlayer : SurfaceHolder.Callback {
     }
 
     override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
-
+        surfaceHolder = holder
     }
 
     override fun surfaceDestroyed(holder: SurfaceHolder) {
 
     }
+
+    fun start(path: String) {
+        surfaceHolder?.surface?.let {
+            start(path, it)
+        }
+    }
+
+    private external fun start(path: String, surface: Surface)
+
 
 }

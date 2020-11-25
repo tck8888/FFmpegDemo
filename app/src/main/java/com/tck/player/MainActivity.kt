@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.WindowManager
 import com.tck.player.R.layout.activity_main
 import kotlinx.android.synthetic.main.activity_main.*
+import java.io.File
 
 class MainActivity : AppCompatActivity() {
 
@@ -28,7 +29,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun open() {
-
+        val path = cacheDir.absolutePath + File.separator + "a.mp4"
+        myPlayer.start(path)
     }
 
 
