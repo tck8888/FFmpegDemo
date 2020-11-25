@@ -20,4 +20,5 @@ target_link_libraries(
         avfilter avcodec avformat avutil swscale
         android
         z
+        OpenSLES
         ${log-lib})
