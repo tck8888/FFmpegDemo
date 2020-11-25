@@ -1,1 +1,1 @@
-# FFmpegDemo
+# MyPlayer

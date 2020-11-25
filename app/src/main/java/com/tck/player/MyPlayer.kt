@@ -1,6 +1,6 @@
 package com.tck.player
 
-import android.view.Surface
+
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 
@@ -33,14 +33,15 @@ class MyPlayer : SurfaceHolder.Callback {
     }
 
     override fun surfaceCreated(holder: SurfaceHolder) {
-        TODO("Not yet implemented")
+
     }
 
     override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
-        TODO("Not yet implemented")
+
     }
 
     override fun surfaceDestroyed(holder: SurfaceHolder) {
-        TODO("Not yet implemented")
+
     }
+
 }
