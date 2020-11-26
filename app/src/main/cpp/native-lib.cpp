@@ -3,16 +3,17 @@
 #include <android/native_window_jni.h>
 #include <zconf.h>
 
-extern "C" {
-#include <libavformat/avformat.h>
-#include <libavutil/imgutils.h>
+extern "C"{
+#include "libavcodec/avcodec.h"
 #include <libswscale/swscale.h>
+#include <libavutil/imgutils.h>
+#include <libavformat/avformat.h>
 }
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_tck_player_MyPlayer_start(JNIEnv *env, jobject thiz, jstring path_, jobject surface) {
 
-    ANativeWindow *aNativeWindow = ANativeWindow_fromSurface(env, surface);
+
 
     const char *path = env->GetStringUTFChars(path_, nullptr);
 
@@ -22,9 +23,6 @@ Java_com_tck_player_MyPlayer_start(JNIEnv *env, jobject thiz, jstring path_, job
     av_dict_set(&avDictionary, "timeout", "3000000", 0);
 
     int ret = avformat_open_input(&avFormatContext, path, nullptr, &avDictionary);
-    if (ret) {
-        return;
-    }
 
     avformat_find_stream_info(avFormatContext, nullptr);
 
@@ -62,6 +60,8 @@ Java_com_tck_player_MyPlayer_start(JNIEnv *env, jobject thiz, jstring path_, job
             nullptr,
             nullptr
     );
+    ANativeWindow *aNativeWindow = ANativeWindow_fromSurface(env, surface);
+    ANativeWindow_Buffer outBuffer;
 
     ANativeWindow_setBuffersGeometry(
             aNativeWindow,
@@ -69,7 +69,10 @@ Java_com_tck_player_MyPlayer_start(JNIEnv *env, jobject thiz, jstring path_, job
             avCodecContext->height,
             WINDOW_FORMAT_RGBA_8888
     );
-    ANativeWindow_Buffer outBuffer;
+    int frameCount = 0;
+    ANativeWindow_setBuffersGeometry(aNativeWindow, avCodecContext->width,
+                                     avCodecContext->height,
+                                     WINDOW_FORMAT_RGBA_8888);
 
     while (av_read_frame(avFormatContext, avPacket) >= 0) {
         avcodec_send_packet(avCodecContext, avPacket);
@@ -92,34 +95,34 @@ Java_com_tck_player_MyPlayer_start(JNIEnv *env, jobject thiz, jstring path_, job
                 AV_PIX_FMT_RGBA,
                 1);
 
-        sws_scale(
-                swsContext,
-                avFrame->data,
-                avFrame->linesize,
-                0,
-                avFrame->height,
-                dst_data,
-                dst_lineSize);
+        if (avPacket->stream_index == video_stream_index) {
+//非零   正在解码
+            if (ret==0) {
+//            绘制之前   配置一些信息  比如宽高   格式
 
-        ANativeWindow_lock(
-                aNativeWindow,
-                &outBuffer,
-                nullptr);
-
-        //rgb_frame是有画面数据
-        uint8_t *dst= (uint8_t *) outBuffer.bits;
-        //拿到一行有多少个字节 RGBA
-        int destStride=outBuffer.stride*4;
-        uint8_t *src_data = dst_data[0];
-        int src_linesize = dst_lineSize[0];
-        uint8_t *firstWindown = static_cast<uint8_t *>(outBuffer.bits);
-
-        for (int i = 0; i < outBuffer.height; ++i) {
-            memcpy(firstWindown + i * destStride, src_data + i * src_linesize, destStride);
+//            绘制
+                ANativeWindow_lock(aNativeWindow, &outBuffer, NULL);
+//     h 264   ----yuv          RGBA
+                //转为指定的YUV420P
+                sws_scale(swsContext,
+                reinterpret_cast<const uint8_t *const *>(avFrame->data), avFrame->linesize, 0,
+                          avFrame->height,
+                          dst_data, dst_lineSize);
+//rgb_frame是有画面数据
+                uint8_t *dst= (uint8_t *) outBuffer.bits;
+//            拿到一行有多少个字节 RGBA
+                int destStride=outBuffer.stride*4;
+                uint8_t *src_data = dst_data[0];
+                int src_linesize = dst_lineSize[0];
+                uint8_t *firstWindown = static_cast<uint8_t *>(outBuffer.bits);
+                for (int i = 0; i < outBuffer.height; ++i) {
+                    memcpy(firstWindown + i * destStride, src_data + i * src_linesize, destStride);
+                }
+                ANativeWindow_unlockAndPost(aNativeWindow);
+                usleep(1000 * 16);
+                av_frame_free(&avFrame);
+            }
         }
-        ANativeWindow_unlockAndPost(aNativeWindow);
-        usleep(1000 * 16);
-        av_frame_free(&avFrame);
     }
     ANativeWindow_release(aNativeWindow);
     avcodec_close(avCodecContext);

@@ -17,8 +17,9 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -L${libs}")
 
 target_link_libraries(
         native-lib
-        avfilter avcodec avformat avutil swscale
-        android
+        avfilter avformat avcodec avutil swresample swscale
+        ${log-lib}
         z
         OpenSLES
+        android
         ${log-lib})
