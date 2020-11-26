@@ -11,7 +11,7 @@ import java.io.File
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var myPlayer: MyPlayer
+    private lateinit var myMusicPlayer: MyMusicPlayer
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.setFlags(
@@ -21,17 +21,23 @@ class MainActivity : AppCompatActivity() {
         setContentView(activity_main)
 
         //3.2.2.1 23
-        myPlayer = MyPlayer()
-        myPlayer.setSurfaceView(surfaceView)
+        myMusicPlayer = MyMusicPlayer()
 
+        myMusicPlayer.setOnPreparedListener(object : OnPreparedListener {
+            override fun onPrepare() {
+                Log.d("tck6666", "onPrepare")
+            }
+        })
         btn_start_play.setOnClickListener {
             open()
         }
     }
 
     private fun open() {
-        val path = cacheDir.absolutePath  +File.separator+ "a.mp4"
-        myPlayer.start(path)
+        Thread {
+            myMusicPlayer.setDataSource("")
+            myMusicPlayer.prepare()
+        }.start()
     }
 
 
