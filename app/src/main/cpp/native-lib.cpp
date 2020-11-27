@@ -4,6 +4,7 @@
 #include <zconf.h>
 #include "MusicPlayer.h"
 #include "JavaCallHelper.h"
+#include "MyPlayerStatus.h"
 
 extern "C" {
 #include "libavcodec/avcodec.h"
@@ -49,5 +50,6 @@ extern "C"
 JNIEXPORT jlong JNICALL
 Java_com_tck_player_MyMusicPlayer_nativeInit(JNIEnv *env, jobject thiz) {
     auto *player = new MusicPlayer(new JavaCallHelper(_JavaVM, env, thiz));
+    player->setPlayerStatus(new MyPlayerStatus());
     return (jlong) player;
 }

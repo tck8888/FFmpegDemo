@@ -9,6 +9,7 @@
 #include "JavaCallHelper.h"
 #include "AndroidLog.h"
 #include "AudioChannel.h"
+#include "MyPlayerStatus.h"
 
 extern "C"
 {
@@ -27,6 +28,7 @@ private:
     char *path= nullptr;
     JavaCallHelper *helper = nullptr;
     AudioChannel *audio = nullptr;
+    MyPlayerStatus *playerStatus = nullptr;
 public:
     pthread_t decodeThread;
     AVFormatContext *avFormatContext = nullptr;
@@ -42,6 +44,8 @@ public:
     void start();
 
     void decodeFFmpegThread();
+
+    void setPlayerStatus(MyPlayerStatus *_pStatus);
 };
 
 

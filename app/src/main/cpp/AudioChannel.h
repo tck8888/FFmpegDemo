@@ -5,6 +5,9 @@
 #ifndef MYMUSICPLAYER_AUDIOCHANNEL_H
 #define MYMUSICPLAYER_AUDIOCHANNEL_H
 
+#include "MyQueue.h"
+#include "MyPlayerStatus.h"
+
 extern "C"
 {
 #include "libavformat/avformat.h"
@@ -12,11 +15,17 @@ extern "C"
 
 class AudioChannel {
 
+public:
+    AudioChannel(MyPlayerStatus *_playerStatus);
+
+    ~AudioChannel();
 
 public:
+    int streamIndex;
     AVCodecParameters *codecpar = nullptr;
     AVCodecContext *avCodecContext = nullptr;
-    int streamIndex;
+    MyQueue *queue = nullptr;
+    MyPlayerStatus *playerStatus = nullptr;
 
 };
 

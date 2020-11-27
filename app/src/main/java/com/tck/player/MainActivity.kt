@@ -5,11 +5,12 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.WindowManager
-import com.tck.player.R.layout.activity_main
-import kotlinx.android.synthetic.main.activity_main.*
+import com.tck.player.databinding.ActivityMainBinding
 import java.io.File
 
 class MainActivity : AppCompatActivity() {
+
+    private lateinit var binding: ActivityMainBinding
 
     private lateinit var myMusicPlayer: MyMusicPlayer
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -18,7 +19,8 @@ class MainActivity : AppCompatActivity() {
             WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,
             WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
         )
-        setContentView(activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         //3.2.2.1 23
         myMusicPlayer = MyMusicPlayer()
@@ -26,9 +28,10 @@ class MainActivity : AppCompatActivity() {
         myMusicPlayer.setOnPreparedListener(object : OnPreparedListener {
             override fun onPrepare() {
                 Log.d("tck6666", "onPrepare")
+                myMusicPlayer.start()
             }
         })
-        btn_start_play.setOnClickListener {
+        binding.btnStartPlay.setOnClickListener {
             open()
         }
     }
