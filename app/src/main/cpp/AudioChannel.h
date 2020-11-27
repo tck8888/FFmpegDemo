@@ -14,8 +14,8 @@ class AudioChannel {
 
 
 public:
-    AVCodecParameters *codecpar;
-    AVCodecContext *avCodecContext;
+    AVCodecParameters *codecpar = nullptr;
+    AVCodecContext *avCodecContext = nullptr;
     int streamIndex;
 
 };

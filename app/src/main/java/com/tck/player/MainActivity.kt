@@ -35,7 +35,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun open() {
         Thread {
-            myMusicPlayer.setDataSource("")
+            myMusicPlayer.setDataSource("${cacheDir}${File.separator}1.mp3")
             myMusicPlayer.prepare()
         }.start()
     }

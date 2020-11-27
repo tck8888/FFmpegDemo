@@ -24,12 +24,12 @@ public:
     ~MusicPlayer();
 
 private:
-    char *path;
-    JavaCallHelper *helper;
-    AudioChannel *audio;
+    char *path= nullptr;
+    JavaCallHelper *helper = nullptr;
+    AudioChannel *audio = nullptr;
 public:
     pthread_t decodeThread;
-    AVFormatContext *avFormatContext;
+    AVFormatContext *avFormatContext = nullptr;
 
 private:
 

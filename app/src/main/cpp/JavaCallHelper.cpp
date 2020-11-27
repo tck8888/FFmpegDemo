@@ -27,7 +27,7 @@ void JavaCallHelper::onCallJavaPrepared(int thread) {
             return;
         }
         jniEnv->CallVoidMethod(jobj, jmid_prepare);
-        javaVM->DestroyJavaVM();
+        javaVM->DetachCurrentThread();
     } else {
         env->CallVoidMethod(jobj, jmid_prepare);
     }
