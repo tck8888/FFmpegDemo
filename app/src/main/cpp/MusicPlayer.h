@@ -25,7 +25,7 @@ public:
     ~MusicPlayer();
 
 private:
-    char *path= nullptr;
+    char *path = nullptr;
     JavaCallHelper *helper = nullptr;
     AudioChannel *audio = nullptr;
     MyPlayerStatus *playerStatus = nullptr;
@@ -42,6 +42,10 @@ public:
     void prepare();
 
     void start();
+
+    void onResume();
+
+    void onPause();
 
     void decodeFFmpegThread();
 

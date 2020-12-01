@@ -26,10 +26,13 @@ public:
     jobject jobj;
     jmethodID jmid_error;
     jmethodID jmid_prepare;
+    jmethodID jmid_onload;
     jmethodID jmid_progress;
 
 public:
-    void onCallJavaPrepared(int thread = THREAD_MAIN);
+    void onCallJavaPrepared(int thread);
+
+    void onCallOnLoad( bool load, int thread);
 
 public:
     void onError(int code, const char *msg, int thread = THREAD_MAIN);

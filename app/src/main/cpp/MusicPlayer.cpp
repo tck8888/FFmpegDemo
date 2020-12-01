@@ -55,7 +55,7 @@ void MusicPlayer::decodeFFmpegThread() {
         if (avFormatContext->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
             if (audio == nullptr) {
                 audio = new AudioChannel(this->playerStatus,
-                                         avFormatContext->streams[i]->codecpar->sample_rate);
+                                         avFormatContext->streams[i]->codecpar->sample_rate,helper);
                 audio->streamIndex = i;
                 audio->codecpar = avFormatContext->streams[i]->codecpar;
                 break;
@@ -108,7 +108,7 @@ void MusicPlayer::prepare() {
 
 void MusicPlayer::start() {
 
-    if (audio == nullptr) {
+    if (audio == NULL) {
         if (LOG_DEBUG) {
             LOGE("audio = nullptr");
         }
@@ -123,9 +123,9 @@ void MusicPlayer::start() {
             if (avPacket->stream_index == audio->streamIndex) {
                 //解码操作
                 count++;
-                if (LOG_DEBUG) {
-                    LOGE("解码第 %d 帧", count);
-                }
+//                if (LOG_DEBUG) {
+//                    LOGE("解码第 %d 帧", count);
+//                }
                 audio->queue->putAvPacket(avPacket);
             } else {
                 av_packet_free(&avPacket);
@@ -149,6 +149,20 @@ void MusicPlayer::start() {
         LOGD("解码完成");
     }
 }
+
+void MusicPlayer::onResume() {
+    if (audio != NULL) {
+        audio->onResume();
+    }
+}
+
+void MusicPlayer::onPause() {
+    if (audio != NULL) {
+        audio->onPause();
+    }
+}
+
+
 
 
 

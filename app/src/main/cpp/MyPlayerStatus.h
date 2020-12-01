@@ -9,7 +9,8 @@
 class MyPlayerStatus {
 
 public:
-    bool exit;
+    bool exit= false;
+    bool load= true;
 public:
     MyPlayerStatus();
     ~MyPlayerStatus();

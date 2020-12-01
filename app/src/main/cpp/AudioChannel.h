@@ -7,7 +7,10 @@
 
 #include "MyQueue.h"
 #include "MyPlayerStatus.h"
+#include "JavaCallHelper.h"
+
 #include "pthread.h"
+
 
 extern "C"
 {
@@ -20,12 +23,15 @@ extern "C"
 class AudioChannel {
 
 public:
-    AudioChannel(MyPlayerStatus *_playerStatus,int _sample_rate);
+    AudioChannel(
+            MyPlayerStatus *_playerStatus,
+            int _sample_rate,
+            JavaCallHelper *_javaCallHelper);
 
     ~AudioChannel();
 
 public:
-    int streamIndex=-1;
+    int streamIndex = -1;
     AVCodecParameters *codecpar = nullptr;
     AVCodecContext *avCodecContext = nullptr;
     MyQueue *queue = nullptr;
@@ -56,12 +62,19 @@ public:
     //缓冲器队列接口
     SLAndroidSimpleBufferQueueItf pcmBufferQueue = NULL;
 
+
+    JavaCallHelper *javaCallHelper = NULL;
+
 public:
     void play();
 
     int resampleAudio();
 
     void initOpenSLES();
+
+    void onResume();
+
+    void onPause();
 
     SLuint32 getCurrentSampleRateForOpensles(int sample_rate);
 };

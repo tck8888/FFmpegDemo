@@ -5,7 +5,7 @@
 #include "MyPlayerStatus.h"
 
 MyPlayerStatus::MyPlayerStatus() {
-    exit = false;
+
 }
 
 MyPlayerStatus::~MyPlayerStatus() {

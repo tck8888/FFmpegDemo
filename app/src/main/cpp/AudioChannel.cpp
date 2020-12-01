@@ -4,8 +4,9 @@
 
 #include "AudioChannel.h"
 
-AudioChannel::AudioChannel(MyPlayerStatus *_playerStatus, int _sample_rate)
-        : playerStatus(_playerStatus), sample_rate(_sample_rate) {
+AudioChannel::AudioChannel(MyPlayerStatus *_playerStatus, int _sample_rate,
+                           JavaCallHelper *_javaCallHelper)
+        : playerStatus(_playerStatus), sample_rate(_sample_rate), javaCallHelper(_javaCallHelper) {
     this->queue = new MyQueue(_playerStatus);
     buffer = (uint8_t *) av_malloc(sample_rate * 2 * 2);
 }
@@ -29,19 +30,30 @@ void AudioChannel::play() {
 
 
 int AudioChannel::resampleAudio() {
-    while(playerStatus != NULL && !playerStatus->exit)
-    {
+    while (playerStatus != NULL && !playerStatus->exit) {
+        if (queue->getQueueSize() == 0) {
+            //加载中
+            if (!playerStatus->load) {
+                playerStatus->load = true;
+                javaCallHelper->onCallOnLoad(true, THREAD_CHILD);
+            }
+            continue;
+        } else {
+            if (playerStatus->load) {
+                playerStatus->load = false;
+                javaCallHelper->onCallOnLoad(false, THREAD_CHILD);
+            }
+        }
+
         avPacket = av_packet_alloc();
-        if(queue->getAvPacket(avPacket) != 0)
-        {
+        if (queue->getAvPacket(avPacket) != 0) {
             av_packet_free(&avPacket);
             av_free(avPacket);
             avPacket = NULL;
             continue;
         }
         ret = avcodec_send_packet(avCodecContext, avPacket);
-        if(ret != 0)
-        {
+        if (ret != 0) {
             av_packet_free(&avPacket);
             av_free(avPacket);
             avPacket = NULL;
@@ -49,15 +61,11 @@ int AudioChannel::resampleAudio() {
         }
         avFrame = av_frame_alloc();
         ret = avcodec_receive_frame(avCodecContext, avFrame);
-        if(ret == 0)
-        {
+        if (ret == 0) {
 
-            if(avFrame->channels && avFrame->channel_layout == 0)
-            {
+            if (avFrame->channels && avFrame->channel_layout == 0) {
                 avFrame->channel_layout = av_get_default_channel_layout(avFrame->channels);
-            }
-            else if(avFrame->channels == 0 && avFrame->channel_layout > 0)
-            {
+            } else if (avFrame->channels == 0 && avFrame->channel_layout > 0) {
                 avFrame->channels = av_get_channel_layout_nb_channels(avFrame->channel_layout);
             }
 
@@ -73,8 +81,7 @@ int AudioChannel::resampleAudio() {
                     avFrame->sample_rate,
                     NULL, NULL
             );
-            if(!swr_ctx || swr_init(swr_ctx) <0)
-            {
+            if (!swr_ctx || swr_init(swr_ctx) < 0) {
                 av_packet_free(&avPacket);
                 av_free(avPacket);
                 avPacket = NULL;
@@ -95,10 +102,9 @@ int AudioChannel::resampleAudio() {
             int out_channels = av_get_channel_layout_nb_channels(AV_CH_LAYOUT_STEREO);
             data_size = nb * out_channels * av_get_bytes_per_sample(AV_SAMPLE_FMT_S16);
 
-            if(LOG_DEBUG)
-            {
-                LOGE("data_size is %d", data_size);
-            }
+//            if (LOG_DEBUG) {
+//                LOGE("data_size is %d", data_size);
+//            }
             av_packet_free(&avPacket);
             av_free(avPacket);
             avPacket = NULL;
@@ -107,7 +113,7 @@ int AudioChannel::resampleAudio() {
             avFrame = NULL;
             swr_free(&swr_ctx);
             break;
-        } else{
+        } else {
             av_packet_free(&avPacket);
             av_free(avPacket);
             avPacket = NULL;
@@ -238,6 +244,18 @@ SLuint32 AudioChannel::getCurrentSampleRateForOpensles(int sample_rate) {
             rate = SL_SAMPLINGRATE_44_1;
     }
     return rate;
+}
+
+void AudioChannel::onResume() {
+    if (pcmPlayerPlay != NULL) {
+        (*pcmPlayerPlay)->SetPlayState(pcmPlayerPlay, SL_PLAYSTATE_PLAYING);
+    }
+}
+
+void AudioChannel::onPause() {
+    if (pcmPlayerPlay != NULL) {
+        (*pcmPlayerPlay)->SetPlayState(pcmPlayerPlay, SL_PLAYSTATE_PAUSED);
+    }
 }
 
 

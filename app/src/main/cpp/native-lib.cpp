@@ -52,4 +52,14 @@ Java_com_tck_player_MyMusicPlayer_nativeInit(JNIEnv *env, jobject thiz) {
     auto *player = new MusicPlayer(new JavaCallHelper(_JavaVM, env, thiz));
     player->setPlayerStatus(new MyPlayerStatus());
     return (jlong) player;
+}extern "C"
+JNIEXPORT void JNICALL
+Java_com_tck_player_MyMusicPlayer_nativePause(JNIEnv *env, jobject thiz, jlong native_handle) {
+    auto *player = reinterpret_cast<MusicPlayer *>(native_handle);
+    player->onPause();
+}extern "C"
+JNIEXPORT void JNICALL
+Java_com_tck_player_MyMusicPlayer_nativeResume(JNIEnv *env, jobject thiz, jlong native_handle) {
+    auto *player = reinterpret_cast<MusicPlayer *>(native_handle);
+    player->onResume();
 }
