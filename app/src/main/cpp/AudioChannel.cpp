@@ -102,6 +102,12 @@ int AudioChannel::resampleAudio() {
             int out_channels = av_get_channel_layout_nb_channels(AV_CH_LAYOUT_STEREO);
             data_size = nb * out_channels * av_get_bytes_per_sample(AV_SAMPLE_FMT_S16);
 
+            now_time = avFrame->pts * av_q2d(time_base);
+            if (now_time < clock) {
+                now_time = clock;
+            }
+            clock = now_time;
+
 //            if (LOG_DEBUG) {
 //                LOGE("data_size is %d", data_size);
 //            }
@@ -131,6 +137,12 @@ void pcmBufferCallBack(SLAndroidSimpleBufferQueueItf bf, void *context) {
     if (audioChannel != NULL) {
         int buffersize = audioChannel->resampleAudio();
         if (buffersize > 0) {
+            if (audioChannel->clock - audioChannel->last_time >= 0.1) {
+                audioChannel->last_time = audioChannel->clock;
+                audioChannel->javaCallHelper->onCallAudioTimeInfo(audioChannel->clock,
+                                                                  audioChannel->duration,
+                                                                  THREAD_CHILD);
+            }
             (*audioChannel->pcmBufferQueue)->Enqueue(audioChannel->pcmBufferQueue,
                                                      (char *) audioChannel->buffer, buffersize);
         }

@@ -55,9 +55,12 @@ void MusicPlayer::decodeFFmpegThread() {
         if (avFormatContext->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
             if (audio == nullptr) {
                 audio = new AudioChannel(this->playerStatus,
-                                         avFormatContext->streams[i]->codecpar->sample_rate,helper);
+                                         avFormatContext->streams[i]->codecpar->sample_rate,
+                                         helper);
                 audio->streamIndex = i;
                 audio->codecpar = avFormatContext->streams[i]->codecpar;
+                audio->duration = avFormatContext->streams[i]->duration / AV_TIME_BASE;
+                audio->time_base = avFormatContext->streams[i]->time_base;
                 break;
             }
         }

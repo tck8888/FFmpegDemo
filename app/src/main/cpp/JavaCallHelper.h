@@ -24,22 +24,17 @@ public:
     JavaVM *javaVM;
     JNIEnv *env;
     jobject jobj;
-    jmethodID jmid_error;
     jmethodID jmid_prepare;
     jmethodID jmid_onload;
-    jmethodID jmid_progress;
+    jmethodID jmid_audio_info;
 
 public:
     void onCallJavaPrepared(int thread);
 
-    void onCallOnLoad( bool load, int thread);
+    void onCallOnLoad(bool load, int thread);
 
-public:
-    void onError(int code, const char *msg, int thread = THREAD_MAIN);
+    void onCallAudioTimeInfo(int curr, int total, int thread);
 
-    void onPrepare(int thread = THREAD_MAIN);
-
-    void onProgress(int progress, int thread = THREAD_MAIN);
 };
 
 

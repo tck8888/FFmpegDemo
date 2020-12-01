@@ -10,8 +10,8 @@ import java.io.File
 
 class MainActivity : AppCompatActivity() {
 
-    companion object{
-        const val TAG="tck6666"
+    companion object {
+        const val TAG = "tck6666"
     }
 
     private lateinit var binding: ActivityMainBinding
@@ -54,6 +54,17 @@ class MainActivity : AppCompatActivity() {
                 super.onResume()
                 Log.d(TAG, "播放中...")
             }
+
+            override fun onTimeInfo(currentTime: Int, totalTime: Int) {
+                super.onTimeInfo(currentTime, totalTime)
+                Log.d(TAG, "currentTime:$currentTime,totalTime:$totalTime")
+                runOnUiThread {
+                    binding.pbPlayProgress.progress = (currentTime.toFloat() / totalTime.toFloat() * 100).toInt()
+                    binding.tvPlayDuration.text = TimeUtil.secondsToStr(totalTime)
+                    binding.tvPlayCurrentProgress.text =
+                        TimeUtil.secondsToStr(currentTime)
+                }
+            }
         })
         binding.btnStartPlay.setOnClickListener {
             open()
@@ -68,16 +79,17 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun pause(){
+    private fun pause() {
         myMusicPlayer.pause()
     }
 
-    private fun resume(){
+    private fun resume() {
         myMusicPlayer.resume()
     }
 
     private fun open() {
         myMusicPlayer.setDataSource("${cacheDir}${File.separator}1.mp3")
+        //myMusicPlayer.setDataSource("http://mpge.5nd.com/2015/2015-11-26/69708/1.mp3")
         myMusicPlayer.prepare()
     }
 

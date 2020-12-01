@@ -15,4 +15,6 @@ interface OnPlayerListener {
     fun onPause()
 
     fun onResume()
+
+    fun onTimeInfo(currentTime:Int,totalTime:Int)
 }

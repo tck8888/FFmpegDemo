@@ -23,4 +23,8 @@ open class OnPlayerListenerAdapter:OnPlayerListener {
     override fun onResume() {
 
     }
+
+    override fun onTimeInfo(currentTime: Int, totalTime: Int) {
+
+    }
 }

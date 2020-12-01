@@ -59,6 +59,10 @@ class MyMusicPlayer {
         onPlayerListener?.onLoad(load)
     }
 
+    fun onCallAudioTimeInfo(currentTime:Int,totalTime:Int){
+        onPlayerListener?.onTimeInfo(currentTime,totalTime)
+    }
+
     fun setOnPreparedListener(onPlayerListener: OnPlayerListener?) {
         this.onPlayerListener = onPlayerListener;
     }

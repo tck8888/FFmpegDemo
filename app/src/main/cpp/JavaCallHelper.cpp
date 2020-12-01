@@ -10,6 +10,7 @@ JavaCallHelper::JavaCallHelper(JavaVM *_javaVM, JNIEnv *_env, jobject &_jobj) : 
     jclass jclazz = env->GetObjectClass(jobj);
     jmid_prepare = env->GetMethodID(jclazz, "onCallJavaPrepared", "()V");
     jmid_onload = env->GetMethodID(jclazz, "onCallLoad", "(Z)V");
+    jmid_audio_info = env->GetMethodID(jclazz, "onCallAudioTimeInfo", "(II)V");
 
 }
 
@@ -43,10 +44,26 @@ void JavaCallHelper::onCallOnLoad(bool load, int thread) {
             }
             return;
         }
-        jniEnv->CallVoidMethod(jobj, jmid_onload,load);
+        jniEnv->CallVoidMethod(jobj, jmid_onload, load);
         javaVM->DetachCurrentThread();
     } else {
-        env->CallVoidMethod(jobj, jmid_onload,load);
+        env->CallVoidMethod(jobj, jmid_onload, load);
+    }
+}
+
+void JavaCallHelper::onCallAudioTimeInfo(int curr, int total, int thread) {
+    if (thread == THREAD_CHILD) {
+        JNIEnv *jniEnv;
+        if (javaVM->AttachCurrentThread(&jniEnv, NULL) != JNI_OK) {
+            if (LOG_DEBUG) {
+                LOGE("get child thread jnienv worng");
+            }
+            return;
+        }
+        jniEnv->CallVoidMethod(jobj, jmid_audio_info, curr, total);
+        javaVM->DetachCurrentThread();
+    } else {
+        env->CallVoidMethod(jobj, jmid_audio_info, curr, total);
     }
 }
 
