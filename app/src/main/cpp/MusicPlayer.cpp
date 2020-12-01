@@ -6,7 +6,6 @@
 #include <cstring>
 #include <malloc.h>
 
-typedef AVPacket *pPacket;
 
 MusicPlayer::MusicPlayer(JavaCallHelper *_helper) : helper(_helper) {
 
@@ -55,7 +54,8 @@ void MusicPlayer::decodeFFmpegThread() {
     for (int i = 0; i < avFormatContext->nb_streams; ++i) {
         if (avFormatContext->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
             if (audio == nullptr) {
-                audio = new AudioChannel(this->playerStatus);
+                audio = new AudioChannel(this->playerStatus,
+                                         avFormatContext->streams[i]->codecpar->sample_rate);
                 audio->streamIndex = i;
                 audio->codecpar = avFormatContext->streams[i]->codecpar;
                 break;
@@ -108,15 +108,16 @@ void MusicPlayer::prepare() {
 
 void MusicPlayer::start() {
 
-    if (!audio) {
+    if (audio == nullptr) {
         if (LOG_DEBUG) {
             LOGE("audio = nullptr");
         }
         return;
     }
+    audio->play();
 
     int count = 0;
-    while (true) {
+    while (playerStatus != nullptr && !playerStatus->exit) {
         AVPacket *avPacket = av_packet_alloc();
         if (av_read_frame(avFormatContext, avPacket) == 0) {
             if (avPacket->stream_index == audio->streamIndex) {
@@ -131,22 +132,17 @@ void MusicPlayer::start() {
                 av_free(avPacket);
             }
         } else {
-            if (LOG_DEBUG) {
-                LOGE("decode finished");
-            }
             av_packet_free(&avPacket);
             av_free(avPacket);
-            break;
+            while (playerStatus != nullptr && !playerStatus->exit) {
+                if (audio->queue->getQueueSize() > 0) {
+                    continue;
+                } else {
+                    playerStatus->exit = true;
+                    break;
+                }
+            }
         }
-    }
-
-    //模拟出队列
-    while (audio->queue->getQueueSize() > 0) {
-        AVPacket *packet = av_packet_alloc();
-        audio->queue->getAvPacket(packet);
-        av_packet_free(&packet);
-        av_free(packet);
-        packet = nullptr;
     }
 
     if (LOG_DEBUG) {

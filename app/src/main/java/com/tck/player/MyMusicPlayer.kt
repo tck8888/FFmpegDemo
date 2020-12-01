@@ -33,11 +33,12 @@ class MyMusicPlayer {
     }
 
     fun prepare() {
-        nativePrepare(nativeHandle)
+        Thread {  nativePrepare(nativeHandle) }.start()
+
     }
 
     fun start() {
-        nativeStart(nativeHandle)
+        Thread { nativeStart(nativeHandle) }.start()
     }
 
     fun onCallJavaPrepared() {
