@@ -16,5 +16,7 @@ interface OnPlayerListener {
 
     fun onResume()
 
-    fun onTimeInfo(currentTime:Int,totalTime:Int)
+    fun onTimeInfo(currentTime: Int, totalTime: Int)
+
+    fun onError(code: Int, msg: String)
 }

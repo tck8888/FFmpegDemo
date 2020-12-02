@@ -52,6 +52,7 @@ void MusicPlayer::decodeFFmpegThread() {
     if (avformat_open_input(&avFormatContext, path, NULL, NULL) != 0) {
         if (LOG_DEBUG) {
             LOGE("can not open url :%s", path);
+            helper->onCallOnError(1001, "can not open url");
             exit = true;
             pthread_mutex_unlock(&init_mutex);
             return;
@@ -61,6 +62,7 @@ void MusicPlayer::decodeFFmpegThread() {
     if (avformat_find_stream_info(avFormatContext, NULL) < 0) {
         if (LOG_DEBUG) {
             LOGE("can not find streams from %s", path);
+            helper->onCallOnError(1002, "can not find streams from url");
             exit = true;
             pthread_mutex_unlock(&init_mutex);
             return;
@@ -95,6 +97,7 @@ void MusicPlayer::decodeFFmpegThread() {
         if (LOG_DEBUG) {
             LOGE("can not find decoder");
         }
+        helper->onCallOnError(1003, "can not find decoder");
         exit = true;
         pthread_mutex_unlock(&init_mutex);
         return;
@@ -104,6 +107,7 @@ void MusicPlayer::decodeFFmpegThread() {
         if (LOG_DEBUG) {
             LOGE("can not alloc new decodecctx");
         }
+        helper->onCallOnError( 1004, "can not alloc new decodecctx");
         exit = true;
         pthread_mutex_unlock(&init_mutex);
         return;
@@ -113,6 +117,7 @@ void MusicPlayer::decodeFFmpegThread() {
         if (LOG_DEBUG) {
             LOGE("can not fill decodecctx");
         }
+        helper->onCallOnError( 1005, "ccan not fill decodecctx");
         exit = true;
         pthread_mutex_unlock(&init_mutex);
         return;
@@ -122,6 +127,7 @@ void MusicPlayer::decodeFFmpegThread() {
         if (LOG_DEBUG) {
             LOGE("cant not open audio strames");
         }
+        helper->onCallOnError( 1006, "cant not open audio strames");
         exit = true;
         pthread_mutex_unlock(&init_mutex);
         return;

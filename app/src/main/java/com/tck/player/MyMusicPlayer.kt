@@ -65,6 +65,10 @@ class MyMusicPlayer {
         onPlayerListener?.onTimeInfo(currentTime, totalTime)
     }
 
+    fun onCallOnError(code: Int, msg: String) {
+        onPlayerListener?.onError(code, msg)
+    }
+
     fun setOnPreparedListener(onPlayerListener: OnPlayerListener?) {
         this.onPlayerListener = onPlayerListener;
     }

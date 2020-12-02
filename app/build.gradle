@@ -18,11 +18,13 @@ android {
         externalNativeBuild {
             cmake {
                 cppFlags ""
+                //Can also use system or none as ANDROID_STL, but not c++_static.
+                arguments "-DANDROID_ARM_MODE=arm", "-DANDROID_STL=c++_shared"
             }
         }
 
         ndk{
-            abiFilters "armeabi-v7a","x86_64"
+            abiFilters "armeabi-v7a","x86_64","arm64-v8a"
         }
     }
 
@@ -45,10 +47,10 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
-
-    viewBinding {
-        enabled = true
+    buildFeatures{
+        viewBinding   true
     }
+
 }
 
 dependencies {
