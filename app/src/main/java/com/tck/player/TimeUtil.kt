@@ -12,8 +12,8 @@ object TimeUtil {
 
     fun secondsToStr(_seconds: Int): String {
         val hours = _seconds / 3600
-        val minutes = (_seconds - hours * 3600) / 60
-        val seconds = _seconds - hours * 3600 - minutes * 60
+        val minutes = (_seconds % 3600) / 60
+        val seconds = _seconds % 60
 
         var timeStr = ""
 

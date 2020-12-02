@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.WindowManager
+import android.widget.SeekBar
 import com.tck.player.databinding.ActivityMainBinding
 import java.io.File
 
@@ -15,6 +16,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private lateinit var binding: ActivityMainBinding
+
+    private var totalTime: Int = 0
 
     private lateinit var myMusicPlayer: MyMusicPlayer
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -57,6 +60,7 @@ class MainActivity : AppCompatActivity() {
 
             override fun onTimeInfo(currentTime: Int, totalTime: Int) {
                 super.onTimeInfo(currentTime, totalTime)
+                this@MainActivity.totalTime = totalTime
                 Log.d(TAG, "currentTime:$currentTime,totalTime:$totalTime")
                 runOnUiThread {
                     binding.pbPlayProgress.progress =
@@ -82,6 +86,20 @@ class MainActivity : AppCompatActivity() {
         binding.btnStopPlay.setOnClickListener {
             myMusicPlayer.stop()
         }
+
+        binding.sbAudio.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+                val progress = seekBar?.progress ?: 0
+                myMusicPlayer.seek(progress)
+            }
+
+        })
     }
 
     private fun pause() {

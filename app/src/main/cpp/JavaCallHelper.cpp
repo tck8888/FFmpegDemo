@@ -12,6 +12,7 @@ JavaCallHelper::JavaCallHelper(JavaVM *_javaVM, JNIEnv *_env, jobject &_jobj) : 
     jmid_onload = env->GetMethodID(jclazz, "onCallLoad", "(Z)V");
     jmid_audio_info = env->GetMethodID(jclazz, "onCallAudioTimeInfo", "(II)V");
     jmid_error = env->GetMethodID(jclazz, "onCallOnError", "(ILjava/lang/String;)V");
+    jmid_complete = env->GetMethodID(jclazz, "onCallOnComplete", "()V");
 
 }
 
@@ -87,5 +88,9 @@ void JavaCallHelper::onCallOnError(int code, const char *msg, int thread) {
         env->CallVoidMethod(jobj, jmid_error, code, jmsg);
         env->DeleteLocalRef(jmsg);
     }
+}
+
+void JavaCallHelper::onCallOnComplete(int thread) {
+
 }
 

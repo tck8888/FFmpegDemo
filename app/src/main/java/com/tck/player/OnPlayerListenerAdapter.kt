@@ -33,4 +33,8 @@ open class OnPlayerListenerAdapter : OnPlayerListener {
     override fun onError(code: Int, msg: String) {
         Log.d("tck6666", "OnPlayerListener-->onError:code=$code,msg=$msg")
     }
+
+    override fun onComplete() {
+        Log.d("tck6666", "OnPlayerListener-->onComplete")
+    }
 }

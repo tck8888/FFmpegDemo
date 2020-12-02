@@ -33,8 +33,10 @@ public:
 public:
     pthread_t decodeThread;
     pthread_mutex_t init_mutex;
+    pthread_mutex_t seek_mutex;
     AVFormatContext *avFormatContext = NULL;
     bool exit = false;
+    int duration = 0;
 private:
 
 
@@ -53,7 +55,7 @@ public:
 
     void decodeFFmpegThread();
 
-    void setPlayerStatus(MyPlayerStatus *_pStatus);
+    void seek(int64_t seconds);
 };
 
 

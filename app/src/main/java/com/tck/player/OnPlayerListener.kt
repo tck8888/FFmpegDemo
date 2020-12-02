@@ -19,4 +19,6 @@ interface OnPlayerListener {
     fun onTimeInfo(currentTime: Int, totalTime: Int)
 
     fun onError(code: Int, msg: String)
+
+    fun onComplete()
 }

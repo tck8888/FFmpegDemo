@@ -28,6 +28,7 @@ public:
     jmethodID jmid_onload;
     jmethodID jmid_audio_info;
     jmethodID jmid_error;
+    jmethodID jmid_complete;
 
 public:
     void onCallJavaPrepared(int thread);
@@ -37,6 +38,7 @@ public:
     void onCallAudioTimeInfo(int curr, int total, int thread);
 
     void onCallOnError(int code, const char *msg, int thread = THREAD_CHILD);
+    void onCallOnComplete(int thread = THREAD_CHILD);
 
 };
 

@@ -53,6 +53,10 @@ class MyMusicPlayer {
         Thread { nativeStop(nativeHandle) }.start()
     }
 
+    fun seek(seconds: Int) {
+        nativeSeek(nativeHandle, seconds);
+    }
+
     fun onCallJavaPrepared() {
         onPlayerListener?.onPrepare()
     }
@@ -69,6 +73,10 @@ class MyMusicPlayer {
         onPlayerListener?.onError(code, msg)
     }
 
+    fun onCallOnComplete() {
+        onPlayerListener?.onComplete()
+    }
+
     fun setOnPreparedListener(onPlayerListener: OnPlayerListener?) {
         this.onPlayerListener = onPlayerListener;
     }
@@ -80,5 +88,6 @@ class MyMusicPlayer {
     private external fun nativePause(nativeHandle: Long)
     private external fun nativeResume(nativeHandle: Long)
     private external fun nativeStop(nativeHandle: Long): Long
+    private external fun nativeSeek(nativeHandle: Long, seconds: Int)
 
 }

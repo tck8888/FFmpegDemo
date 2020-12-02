@@ -31,6 +31,11 @@ void AudioChannel::play() {
 int AudioChannel::resampleAudio() {
     data_size = 0;
     while (playerStatus != NULL && !playerStatus->exit) {
+
+        if (playerStatus->seek) {
+            continue;
+        }
+
         if (queue->getQueueSize() == 0) {
             //加载中
             if (!playerStatus->load) {

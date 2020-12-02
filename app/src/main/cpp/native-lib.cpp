@@ -59,7 +59,6 @@ extern "C"
 JNIEXPORT jlong JNICALL
 Java_com_tck_player_MyMusicPlayer_nativeInit(JNIEnv *env, jobject thiz) {
     auto *player = new MusicPlayer(_JavaVM, env, thiz);
-    player->setPlayerStatus(new MyPlayerStatus());
     return (jlong) player;
 }extern "C"
 JNIEXPORT void JNICALL
@@ -86,4 +85,14 @@ Java_com_tck_player_MyMusicPlayer_nativeStop(JNIEnv *env, jobject thiz, jlong na
     delete player;
     player = NULL;
     return 0;
+}
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_tck_player_MyMusicPlayer_nativeSeek(JNIEnv *env, jobject thiz, jlong native_handle,
+                                             jint seconds) {
+    auto *player = reinterpret_cast<MusicPlayer *>(native_handle);
+    if (player == NULL) {
+        return;
+    }
+    player->seek(seconds);
 }

@@ -13,11 +13,9 @@ MusicPlayer::MusicPlayer(JavaVM *_javaVM,
     this->playerStatus = new MyPlayerStatus();
     this->exit = false;
     pthread_mutex_init(&init_mutex, NULL);
+    pthread_mutex_init(&seek_mutex, NULL);
 }
 
-void MusicPlayer::setPlayerStatus(MyPlayerStatus *_pStatus) {
-    this->playerStatus = _pStatus;
-}
 
 void MusicPlayer::setDataSource(const char *path_) {
     path = new char[strlen(path_) + 1];
@@ -77,8 +75,10 @@ void MusicPlayer::decodeFFmpegThread() {
                                          helper);
                 audio->streamIndex = i;
                 audio->codecpar = avFormatContext->streams[i]->codecpar;
-                audio->duration = avFormatContext->streams[i]->duration / AV_TIME_BASE;
+                //avFormatContext->streams[i]->duration单位us  转换为秒需要除以1000000 1000000
+                audio->duration = (avFormatContext->streams[i]->duration / AV_TIME_BASE);
                 audio->time_base = avFormatContext->streams[i]->time_base;
+                duration = audio->duration;
                 break;
             }
         }
@@ -107,7 +107,7 @@ void MusicPlayer::decodeFFmpegThread() {
         if (LOG_DEBUG) {
             LOGE("can not alloc new decodecctx");
         }
-        helper->onCallOnError( 1004, "can not alloc new decodecctx");
+        helper->onCallOnError(1004, "can not alloc new decodecctx");
         exit = true;
         pthread_mutex_unlock(&init_mutex);
         return;
@@ -117,7 +117,7 @@ void MusicPlayer::decodeFFmpegThread() {
         if (LOG_DEBUG) {
             LOGE("can not fill decodecctx");
         }
-        helper->onCallOnError( 1005, "ccan not fill decodecctx");
+        helper->onCallOnError(1005, "ccan not fill decodecctx");
         exit = true;
         pthread_mutex_unlock(&init_mutex);
         return;
@@ -127,7 +127,7 @@ void MusicPlayer::decodeFFmpegThread() {
         if (LOG_DEBUG) {
             LOGE("cant not open audio strames");
         }
-        helper->onCallOnError( 1006, "cant not open audio strames");
+        helper->onCallOnError(1006, "cant not open audio strames");
         exit = true;
         pthread_mutex_unlock(&init_mutex);
         return;
@@ -158,16 +158,18 @@ void MusicPlayer::start() {
     }
     audio->play();
 
-    int count = 0;
     while (playerStatus != NULL && !playerStatus->exit) {
+        if (playerStatus->seek) {
+            continue;
+        }
+
+        if (audio->queue->getQueueSize() > 40) {
+            continue;
+        }
+
         AVPacket *avPacket = av_packet_alloc();
         if (av_read_frame(avFormatContext, avPacket) == 0) {
             if (avPacket->stream_index == audio->streamIndex) {
-                //解码操作
-                count++;
-//                if (LOG_DEBUG) {
-//                    LOGE("解码第 %d 帧", count);
-//                }
                 audio->queue->putAvPacket(avPacket);
             } else {
                 av_packet_free(&avPacket);
@@ -281,6 +283,27 @@ void MusicPlayer::release() {
 
 MusicPlayer::~MusicPlayer() {
     pthread_mutex_destroy(&init_mutex);
+    pthread_mutex_destroy(&seek_mutex);
+}
+
+void MusicPlayer::seek(int64_t seconds) {
+    if (duration <= 0) {
+        return;
+    }
+
+    if (seconds >= 0 && seconds <= duration) {
+        if (audio != NULL) {
+            playerStatus->seek = true;
+            audio->queue->clearAvPacket();
+            audio->clock = 0;
+            audio->last_time = 0;
+            pthread_mutex_lock(&seek_mutex);
+            int64_t rel = seconds * AV_TIME_BASE;
+            avformat_seek_file(avFormatContext, -1, INT64_MIN, rel, INT64_MAX, 0);
+            pthread_mutex_unlock(&seek_mutex);
+            playerStatus->seek = false;
+        }
+    }
 }
 
 

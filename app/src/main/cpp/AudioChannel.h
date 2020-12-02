@@ -46,7 +46,7 @@ public:
     int data_size = 0;
     int sample_rate = 0;
 
-    int duration = 0;
+    int64_t duration = 0;
     AVRational time_base;
     double clock;//总的播放时长
     double now_time;//当前frame时间

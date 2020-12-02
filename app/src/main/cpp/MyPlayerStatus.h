@@ -11,6 +11,7 @@ class MyPlayerStatus {
 public:
     bool exit= false;
     bool load= true;
+    bool seek = false;
 public:
     MyPlayerStatus();
     ~MyPlayerStatus();
