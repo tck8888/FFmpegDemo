@@ -15,8 +15,8 @@ JavaCallHelper::JavaCallHelper(JavaVM *_javaVM, JNIEnv *_env, jobject &_jobj) : 
 }
 
 JavaCallHelper::~JavaCallHelper() {
-    env->DeleteGlobalRef(jobj);
-    jobj = nullptr;
+    //env->DeleteGlobalRef(jobj);
+  //  jobj = NULL;
 }
 
 void JavaCallHelper::onCallJavaPrepared(int thread) {

@@ -32,16 +32,16 @@ public:
 
 public:
     int streamIndex = -1;
-    AVCodecParameters *codecpar = nullptr;
-    AVCodecContext *avCodecContext = nullptr;
-    MyQueue *queue = nullptr;
-    MyPlayerStatus *playerStatus = nullptr;
-    uint8_t *buffer = nullptr;
+    AVCodecParameters *codecpar = NULL;
+    AVCodecContext *avCodecContext = NULL;
+    MyQueue *queue = NULL;
+    MyPlayerStatus *playerStatus = NULL;
+    uint8_t *buffer = NULL;
 
     pthread_t thread_play;
 
-    AVPacket *avPacket = nullptr;
-    AVFrame *avFrame = nullptr;
+    AVPacket *avPacket = NULL;
+    AVFrame *avFrame = NULL;
     int ret = 0;
     int data_size = 0;
     int sample_rate = 0;
@@ -81,6 +81,10 @@ public:
     void onResume();
 
     void onPause();
+
+    void onStop();
+
+    void release();
 
     SLuint32 getCurrentSampleRateForOpensles(int sample_rate);
 };

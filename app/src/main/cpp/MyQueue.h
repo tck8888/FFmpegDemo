@@ -35,6 +35,8 @@ public:
     int getAvPacket(AVPacket *packet);
 
     int getQueueSize();
+
+    void clearAvPacket()
 };
 
 

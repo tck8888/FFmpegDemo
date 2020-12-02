@@ -14,25 +14,27 @@
 extern "C"
 {
 #include "libavformat/avformat.h"
+#include <libavutil/time.h>
 }
 
 
 class MusicPlayer {
 
 public:
-    MusicPlayer(JavaCallHelper *_helper);
+    MusicPlayer(JavaVM *_javaVM, JNIEnv *_env, jobject &_jobj);
 
     ~MusicPlayer();
 
-private:
-    char *path = nullptr;
-    JavaCallHelper *helper = nullptr;
-    AudioChannel *audio = nullptr;
-    MyPlayerStatus *playerStatus = nullptr;
+public:
+    char *path = NULL;
+    JavaCallHelper *helper = NULL;
+    AudioChannel *audio = NULL;
+    MyPlayerStatus *playerStatus = NULL;
 public:
     pthread_t decodeThread;
-    AVFormatContext *avFormatContext = nullptr;
-
+    pthread_mutex_t init_mutex;
+    AVFormatContext *avFormatContext = NULL;
+    bool exit = false;
 private:
 
 
@@ -46,6 +48,8 @@ public:
     void onResume();
 
     void onPause();
+
+    void release();
 
     void decodeFFmpegThread();
 

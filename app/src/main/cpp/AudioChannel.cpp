@@ -20,16 +20,16 @@ void *decoderPlay(void *data) {
     audio->resampleAudio();
     audio->initOpenSLES();
     pthread_exit(&audio->thread_play);
-    return nullptr;
+    return NULL;
 }
 
 void AudioChannel::play() {
     pthread_create(&thread_play, NULL, decoderPlay, this);
-
 }
 
 
 int AudioChannel::resampleAudio() {
+    data_size = 0;
     while (playerStatus != NULL && !playerStatus->exit) {
         if (queue->getQueueSize() == 0) {
             //加载中
@@ -269,5 +269,79 @@ void AudioChannel::onPause() {
         (*pcmPlayerPlay)->SetPlayState(pcmPlayerPlay, SL_PLAYSTATE_PAUSED);
     }
 }
+
+
+void AudioChannel::onStop() {
+    if (pcmPlayerPlay != NULL) {
+        (*pcmPlayerPlay)->SetPlayState(pcmPlayerPlay, SL_PLAYSTATE_STOPPED);
+    }
+}
+
+void AudioChannel::release() {
+
+    if (LOG_DEBUG) {
+        LOGE("释放 queue");
+    }
+
+    if (queue != NULL) {
+        delete (queue);
+        queue = NULL;
+    }
+    if (LOG_DEBUG) {
+        LOGE("释放 pcmPlayerObject");
+    }
+    if (pcmPlayerObject != NULL) {
+        (*pcmPlayerObject)->Destroy(pcmPlayerObject);
+        pcmPlayerObject = NULL;
+        pcmPlayerPlay = NULL;
+        pcmBufferQueue = NULL;
+    }
+
+    if (LOG_DEBUG) {
+        LOGE("释放 outputMixObject");
+    }
+
+    if (outputMixObject != NULL) {
+        (*outputMixObject)->Destroy(outputMixObject);
+        outputMixObject = NULL;
+        outputMixEnvironmentalReverb = NULL;
+    }
+    if (LOG_DEBUG) {
+        LOGE("释放 engineObject");
+    }
+    if (engineObject != NULL) {
+        (*engineObject)->Destroy(engineObject);
+        engineObject = NULL;
+        engineEngine = NULL;
+    }
+    if (LOG_DEBUG) {
+        LOGE("释放 buffer");
+    }
+    if (buffer != NULL) {
+        free(buffer);
+        buffer = NULL;
+    }
+    if (LOG_DEBUG) {
+        LOGE("释放 avCodecContext");
+    }
+
+    if (avCodecContext != NULL) {
+        avcodec_close(avCodecContext);
+        avcodec_free_context(&avCodecContext);
+        avCodecContext = NULL;
+    }
+
+    if (playerStatus != NULL) {
+        playerStatus = NULL;
+    }
+    if (javaCallHelper != NULL) {
+        javaCallHelper = NULL;
+    }
+
+    if (LOG_DEBUG) {
+        LOGE("释放 AudioChannel完成");
+    }
+}
+
 
 

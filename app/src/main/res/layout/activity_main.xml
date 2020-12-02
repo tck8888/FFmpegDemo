@@ -37,6 +37,14 @@
             android:layout_marginEnd="10dp"
             android:text="恢复播放" />
 
+
+        <Button
+            android:id="@+id/btn_stop_play"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="10dp"
+            android:text="播放销毁" />
     </com.google.android.flexbox.FlexboxLayout>
 
     <TextView

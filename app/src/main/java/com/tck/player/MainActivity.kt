@@ -59,7 +59,8 @@ class MainActivity : AppCompatActivity() {
                 super.onTimeInfo(currentTime, totalTime)
                 Log.d(TAG, "currentTime:$currentTime,totalTime:$totalTime")
                 runOnUiThread {
-                    binding.pbPlayProgress.progress = (currentTime.toFloat() / totalTime.toFloat() * 100).toInt()
+                    binding.pbPlayProgress.progress =
+                        (currentTime.toFloat() / totalTime.toFloat() * 100).toInt()
                     binding.tvPlayDuration.text = TimeUtil.secondsToStr(totalTime)
                     binding.tvPlayCurrentProgress.text =
                         TimeUtil.secondsToStr(currentTime)
@@ -76,6 +77,10 @@ class MainActivity : AppCompatActivity() {
 
         binding.btnResumePlay.setOnClickListener {
             resume()
+        }
+
+        binding.btnStopPlay.setOnClickListener {
+            myMusicPlayer.stop()
         }
     }
 

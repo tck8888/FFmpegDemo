@@ -20,15 +20,13 @@ class MyMusicPlayer {
         }
     }
 
-    private val nativeHandle: Long
+    private var nativeHandle: Long = 0L
 
     private var onPlayerListener: OnPlayerListener? = null
 
-    init {
-        nativeHandle = nativeInit()
-    }
 
     fun setDataSource(url: String) {
+        nativeHandle = nativeInit()
         setDataSource(nativeHandle, url)
     }
 
@@ -51,6 +49,10 @@ class MyMusicPlayer {
         onPlayerListener?.onResume()
     }
 
+    fun stop() {
+        Thread { nativeStop(nativeHandle) }.start()
+    }
+
     fun onCallJavaPrepared() {
         onPlayerListener?.onPrepare()
     }
@@ -59,8 +61,8 @@ class MyMusicPlayer {
         onPlayerListener?.onLoad(load)
     }
 
-    fun onCallAudioTimeInfo(currentTime:Int,totalTime:Int){
-        onPlayerListener?.onTimeInfo(currentTime,totalTime)
+    fun onCallAudioTimeInfo(currentTime: Int, totalTime: Int) {
+        onPlayerListener?.onTimeInfo(currentTime, totalTime)
     }
 
     fun setOnPreparedListener(onPlayerListener: OnPlayerListener?) {
@@ -73,5 +75,6 @@ class MyMusicPlayer {
     private external fun nativeStart(nativeHandle: Long)
     private external fun nativePause(nativeHandle: Long)
     private external fun nativeResume(nativeHandle: Long)
+    private external fun nativeStop(nativeHandle: Long): Long
 
 }

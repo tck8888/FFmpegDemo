@@ -11,9 +11,6 @@ MyQueue::MyQueue(MyPlayerStatus *_playerStatus) : playerStatus(_playerStatus) {
 
 }
 
-MyQueue::~MyQueue() {
-
-}
 
 int MyQueue::putAvPacket(AVPacket *packet) {
 
@@ -60,4 +57,29 @@ int MyQueue::getQueueSize() {
     size = queuePacket.size();
     pthread_mutex_unlock(&mutexPacket);
     return size;
+}
+
+
+MyQueue::~MyQueue() {
+    clearAvPacket();
+}
+
+void MyQueue::clearAvPacket() {
+    if (LOG_DEBUG) {
+        LOGD("释放队列--->开始");
+    }
+    pthread_cond_signal(&condPacket);
+    pthread_mutex_unlock(&mutexPacket);
+    while (!queuePacket.empty()) {
+        AVPacket *packet = queuePacket.front();
+        queuePacket.pop();
+        av_packet_free(&packet);
+        av_free(packet);
+        packet = NULL;
+    }
+    pthread_mutex_unlock(&mutexPacket);
+
+    if (LOG_DEBUG) {
+        LOGD("释放队列--->完成");
+    }
 }
